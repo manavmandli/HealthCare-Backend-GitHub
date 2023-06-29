@@ -23,4 +23,5 @@ urlpatterns = [
     path('activate/<uuid:reset_uuid>/', ActivateView.as_view(), name="activate"),
     path('user_profile/<int:pk>/', UserProfileView.as_view(), name="user_profile"),
     path('user_profile/', UserProfileView.as_view(), name="user_profile"),
+    path('user_rating',UserRatingView.as_view()),
 ]

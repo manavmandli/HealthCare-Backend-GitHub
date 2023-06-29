@@ -17,6 +17,7 @@ from django.core.validators import validate_email
 from django.contrib.auth.password_validation import validate_password
 from constants.status import codes
 from constants.project import PASSWORD_RESET_LINK_EXPIRY_MINS
+from django.core.exceptions import ObjectDoesNotExist
 
 
 # Create your views here.
@@ -280,3 +281,55 @@ class UserProfileView(APIView):
                 return Response({"status": False, "message": "Authentication token is not set properly"}, status=codes.AUTH_ERROR)
         except Exception as e:
             return Response({"status":False, "message":str(e)}, status=codes.SERVER_ERROR)
+
+class UserRatingView(APIView):
+    def post(self, request):
+        try:
+            user = request.user
+            if user.is_authenticated and user.is_active:
+                serializer = UserRatingSerializer(data={**request.data, "rated_by": request.user.id})
+                rated_user = request.data["rated_user"]
+
+                if user.id == rated_user:
+                    return Response({"status": False, "message": "Same user cannot provide a rating to themselves"}, status=codes.CONFLICT)
+                
+                is_exist = RatingModel.objects.filter(rated_by=request.user.id, rated_user=rated_user).exists()
+
+                if is_exist:
+                    return Response({"status": False, "message": "Same user cannot provide another rating"}, status=codes.CONFLICT)
+
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({"status": True, "message": "Rating given to user", "data": serializer.data}, status=codes.OK)
+                else:
+                    error_message = "Invalid data provided. Please check the following errors:"
+                    errors = []
+                    for field, field_errors in serializer.errors.items():
+                        field_errors = [str(error) for error in field_errors]
+                        errors.append(f"{field}: {', '.join(field_errors)}")
+                    return Response({"status": False, "message": {"error_message": error_message, "errors": errors}}, status=codes.CLIENT_ERROR)
+            else:
+                return Response({"status": False, "message": "Token is not set properly"}, status=codes.AUTH_ERROR)
+        except Exception as e:
+            return Response({"status": False, "message": str(e)}, status=codes.SERVER_ERROR)   
+
+    def get(self, request):
+        try:
+            user = request.user
+            if user.is_authenticated and user.is_active:
+                ratings = RatingModel.objects.filter(rated_user=user)
+                serializer = UserRatingSerializer(ratings, many=True)
+                return Response(
+                    {"status": True, "message": "Ratings for the user", "data": serializer.data},
+                    status=codes.OK
+                )
+            else:
+                return Response(
+                    {"status": False, "message": "Token is not set properly"},
+                    status=codes.AUTH_ERROR
+                )
+        except Exception as e:
+            return Response(
+            {"status": False, "message": str(e)},
+            status=codes.SERVER_ERROR
+        )

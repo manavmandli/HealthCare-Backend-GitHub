@@ -4,6 +4,8 @@ from uuid import uuid4
 from phonenumber_field.modelfields import PhoneNumberField
 from common_app.models import *
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator
+
 
 # from rest_framework.authtoken.models import Token
 
@@ -156,3 +158,18 @@ class BaseProfileModel(models.Model):
 
     def __str__(self):
         return str(self.user)
+
+
+class RatingModel(models.Model):
+    rated_by=models.ForeignKey(CustomUser, on_delete=models.CASCADE,related_name='given_ratings')
+    rated_user=models.ForeignKey(CustomUser, on_delete=models.CASCADE,related_name='received_ratings')
+    stars = models.PositiveIntegerField(validators=[MaxValueValidator(5)])
+    feedback = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.stars)
+
+    class Meta:
+        verbose_name = 'Manage Rating'
+        verbose_name_plural = 'Manage Ratings'
