@@ -61,3 +61,7 @@ class ProfilePicModelAdmin(ImportExportModelAdmin):
 @admin.register(RatingModel)
 class RatingModelAdmin(ImportExportModelAdmin):
     list_display = ("id", "rated_by", "rated_user", "stars","feedback","created_at")
+
+@admin.register(NotificationModel)
+class NotificationModelAdmin(admin.ModelAdmin):
+    list_display=('id','user_id','content','posted_at','is_read')

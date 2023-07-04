@@ -5,7 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from common_app.models import *
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
-
+from django.utils import timezone
 
 # from rest_framework.authtoken.models import Token
 
@@ -159,6 +159,15 @@ class BaseProfileModel(models.Model):
     def __str__(self):
         return str(self.user)
 
+class NotificationModel(models.Model):
+    user_id=models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    content=models.TextField()
+    posted_at = models.DateTimeField(default=timezone.now)
+    is_read=models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'Manage Notification'
+        verbose_name_plural = 'Manage Notification'
 
 class RatingModel(models.Model):
     rated_by=models.ForeignKey(CustomUser, on_delete=models.CASCADE,related_name='given_ratings')

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import * 
+from user_app.models import *
 from .serializers import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,7 +9,7 @@ from provider_app.models import *
 from provider_app.serializers import *
 from django.core.exceptions import ObjectDoesNotExist
 from urllib.error import HTTPError
-
+from django.utils import timezone
 # Create your views here.
 
 
@@ -28,3 +28,6 @@ class Cities(APIView):
         except Exception as e:
             
             return Response({"status":False, "message":str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+def notification(notification_des,user):
+    new_notification=NotificationModel.objects.create(user_id=user,content=notification_des,posted_at=timezone.now())

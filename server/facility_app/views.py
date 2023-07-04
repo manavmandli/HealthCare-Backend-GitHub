@@ -11,6 +11,7 @@ from .utils import *
 from django.core.exceptions import ObjectDoesNotExist
 from urllib.error import HTTPError
 from constants.status import codes
+from django.db.models import Q
 
 # Create your views here.
 
@@ -55,21 +56,44 @@ class JobPostAPI(APIView):
             if pk is not None:
                 job_post = JobPostModel.objects.get(id=pk)
                 serializer = FacilityJobPostingSerializer(job_post)
-                return Response({"status":True, "jobs": serializer.data}, status=codes.OK)
+                return Response({"status": True, "jobs": serializer.data}, status=codes.OK)
             else:
+                title = request.GET.get('title')
                 if request.user.role == "provider":
-                    job_post = JobPostModel.objects.order_by('-posted_on')
+                    job_post = JobPostModel.objects.filter(Q(title__icontains=title) if title else Q()).order_by('-posted_on')
                     serializer = ProviderJobPostingSerializer(job_post, many=True)
-                    return Response({"status":True, "jobs": serializer.data}, status=codes.OK)
+                    return Response({"status": True, "jobs": serializer.data}, status=codes.OK)
 
                 elif request.user.role == "facility":
-                    job_post = JobPostModel.objects.filter(user=request.user)
+                    job_post = JobPostModel.objects.filter(Q(user=request.user) & Q(title__icontains=title) if title else Q())
                     serializer = FacilityJobPostingSerializer(job_post, many=True)
-                    return Response({"status":True, "jobs": serializer.data}, status=codes.OK)
+                    return Response({"status": True, "jobs": serializer.data}, status=codes.OK)
 
         except JobPostModel.DoesNotExist:
-            return Response({"status":False, "message": "Requested job post does not exist!"}, status=codes.CLIENT_ERROR)
+            return Response({"status": False, "message": "Requested job post does not exist!"}, status=codes.CLIENT_ERROR)
 
         except Exception as e:
             print(e)
-            return Response({"status":False, "message":str(e)}, status=codes.CLIENT_ERROR)
+            return Response({"status": False, "message": str(e)}, status=codes.CLIENT_ERROR)
+        
+    def patch(self, request, pk, format=None):
+        try:
+            user = request.user
+            if user.is_authenticated and user.is_active:
+                id = pk 
+                job_post = JobPostModel.objects.get(pk=id)
+                if job_post.user_id == user:
+                    serializer = JobPostSerializer(job_post, data=request.data, partial=True)
+                    if serializer.is_valid():
+                        facility_name = FacilityModel.objects.get(user_id=user.id)
+                        serializer.save(user_id=user, facility_id=facility_name)
+                        return Response({"status":True, "message":"Job post updated", "data":serializer.data}, status=codes.OK)
+                    else:
+                        return Response({"status":False, "message":"Job post not updated", "data":serializer.errors}, status=codes.CLIENT_ERROR)
+                else:
+                    return Response({"status":False, "message":"Facility is not authorized to update this job post"}, status=codes.CONFLICT)
+            else:
+                return Response({"status":False, "message":"Token is not set properly"}, status=codes.AUTH_ERROR)
+
+        except Exception as e:
+            return Response({"status":False, "message":str(e)}, status=codes.SERVER_ERROR)

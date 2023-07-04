@@ -282,6 +282,74 @@ class UserProfileView(APIView):
         except Exception as e:
             return Response({"status":False, "message":str(e)}, status=codes.SERVER_ERROR)
 
+class NotificationView(APIView):
+    def get(self,request):
+        try:
+            user = request.user
+            if user.is_authenticated and user.is_active:
+                user_id = request.user.id
+                notifications = NotificationModel.objects.all().filter(user_id=user_id)
+                if notifications:
+                    serializer = NotificationSerializer(notifications, many=True)
+                    return Response({"status": True, "message": "All Notifications :- ", "data": serializer.data}, status=codes.OK)  
+                else:
+                    return Response({"status": False, "message": "Notification is not avialable"}, status=codes.CONFLICT)    
+            else:
+                return Response({"status": False, "message": "Token is not set properly"}, status=codes.AUTH_ERROR)    
+        except Exception as e:
+            return Response({"status":False, "message":str(e)}, status=codes.CLIENT_ERROR)
+        
+    def patch(self, request, id=None):
+        try:
+            user = request.user
+            if user.is_authenticated and user.is_active:
+                user_id = request.user.id
+                notification_id = id
+                if notification_id:
+                    notification = NotificationModel.objects.get(id=notification_id)
+                    if notification:
+                        notification.is_read = True
+                        notification.save()
+                        return Response({"status": True, "message": "Reded succesfully"}, status=codes.OK)
+                    else:
+                        return Response({"status": False, "message": "This notification is not exists"}, status=codes.CLIENT_ERROR)
+                else:
+                    notifications = NotificationModel.objects.filter(user_id=user_id)
+                    if notifications:
+                        notifications.update(is_read=True)
+                        return Response({"status": True, "message": "All Notifications reded succesfully"}, status=codes.OK)
+                    else:
+                        return Response({"status": False, "message": "Notification Not found"}, status=codes.CLIENT_ERROR)
+            else:
+                return Response({"status": False, "message": "Token is not set properly"}, status=codes.AUTH_ERROR)
+        except Exception as e:
+            return Response({"status": False, "message": str(e)}, status=codes.CLIENT_ERROR)
+        
+    def delete(self, request, id=None):
+        try:
+            user = request.user
+            if user.is_authenticated and user.is_active:
+                user_id = request.user.id
+                notification_id = id
+                if notification_id:
+                    notification = NotificationModel.objects.get(id=notification_id)
+                    if notification:
+                        notification.delete()
+                        return Response({"status": True, "message": "This notification cleared successfully"}, status=codes.OK)
+                    else:
+                        return Response({"status": False, "message": "This notification is not exists"}, status=codes.CLIENT_ERROR)
+                else:
+                    notifications = NotificationModel.objects.filter(user_id=user_id)
+                    if notifications:
+                        notifications.delete()
+                        return Response({"status": True, "message": "All notifications cleared successfully"}, status=codes.OK)
+                    else:
+                        return Response({"status": False, "message": "Notification is box is empty"}, status=codes.CLIENT_ERROR)
+            else:
+                return Response({"status": False, "message": "Token is not set properly"}, status=codes.AUTH_ERROR)
+        except Exception as e:
+            return Response({"status": False, "message": str(e)}, status=codes.CLIENT_ERROR)
+        
 class UserRatingView(APIView):
     def post(self, request):
         try:

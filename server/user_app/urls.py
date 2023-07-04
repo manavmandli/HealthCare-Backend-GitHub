@@ -24,4 +24,6 @@ urlpatterns = [
     path('user_profile/<int:pk>/', UserProfileView.as_view(), name="user_profile"),
     path('user_profile/', UserProfileView.as_view(), name="user_profile"),
     path('user_rating',UserRatingView.as_view()),
+    path('notification/<int:id>',NotificationView.as_view(),name="notification"),
+    path('notification',NotificationView.as_view(),name="notification"),
 ]
