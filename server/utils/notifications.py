@@ -21,12 +21,18 @@ def get_notification_message_template(action):
     else:
         return None
 
-def send_notification(reciever=None, action=None, context=[]):
-    if reciever is not None:
+def send_notification(receiver=None, action=None, context=[]):
+    if receiver is not None:
         message_template = get_notification_message_template(action)
         if message_template is not None:
             message_content = message_template.format(*context)
-            created = NotificationModel.objects.create(reciever=reciever, content=message_content)            
+            
+            created = []
+            for user in receiver:
+                notification = NotificationModel.objects.create(content=message_content)
+                notification.reciever.add(user)
+                created.append(notification)
+            
             if created:
                 return True
             else:
@@ -35,5 +41,4 @@ def send_notification(reciever=None, action=None, context=[]):
             return False
     else:
         return False
-        
     

@@ -6,7 +6,7 @@ from user_app.models import CustomUser
 
 class NotificationModel(models.Model):
     # generated_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="sender")
-    reciever = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="reciever")
+    reciever = models.ManyToManyField(CustomUser, on_delete=models.CASCADE, related_name="reciever")
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True) 
     is_read = models.BooleanField(default=False)

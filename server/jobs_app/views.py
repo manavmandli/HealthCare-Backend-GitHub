@@ -153,7 +153,8 @@ class JobApplicationsAPI(APIView):
                     serializer = JobApplicationsSerializer(data={**request.data, "user": user.id})
                     if serializer.is_valid():
                         serializer.save()
-                        sent = send_notification(reciever=serializer.validated_data['job'].user, action="new_job_application", context=[serializer.validated_data['job'].title])
+                        users = [user, user, user]
+                        sent = send_notification(receiver=users, action="new_job_application", coorntext=[serializer.validated_data['job'].title])
                         return Response({"status":True, "message":"Application successful!"}, status=codes.OK)
                     else:
                         return Response({"status":False, "message": serializer.errors}, status=codes.SERVER_ERROR)
