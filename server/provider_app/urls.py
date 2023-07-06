@@ -17,13 +17,15 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('provider_profile/<int:pk>/', ProviderView.as_view(), name='provider_profile'),
-    path('provider_profile/', ProviderView.as_view(), name='provider_profile'),
-    path('experience/<int:pk>/', ExperienceAPI.as_view(), name='experience'),
-    path('experience/', ExperienceAPI.as_view(), name='experience'),
-    path('educational/<int:pk>/', EducationalView.as_view(), name='educational'),
-    path('educational/', EducationalView.as_view(), name='educational'),
-    path('job_applicant/<int:pk>/', JobApplicationView.as_view(), name='job_applicant'),
-    path('job_applicant/', JobApplicationView.as_view(), name='job_applicant'),
-    path('profile_picture/', ProfilePictureAPI.as_view(), name='profile_picture')
+    path('provider/', ProviderAPI.as_view(), name='provider'),
+    path('provider/<int:pk>/', ProviderAPI.as_view(), name='provider'),
+    path('search_facility/', SearchFacilityAPI.as_view(), name='search_facility'),
+    path('search_facility/<int:pk>/', SearchFacilityAPI.as_view(), name='search_facility'),
+    path('accept-hiring-proposals/',AcceptHiring.as_view(),name="hiring"),
+    path('accept-hiring-proposals/<int:pk>/',AcceptHiring.as_view(),name="hiring"),
+    path('view_provider_rating/<int:pk>/', ViewProviderRating.as_view(), name="view_provider_rating"),
+    path('view_provider_rating/', ViewProviderRating.as_view(), name="view_provider_rating"),
+    path('give_rating_to_facility/', GiveRatingToFacility.as_view(), name="give_rating_to_facility"),
+    path('average_rating_provider/', AverageRatingProvider.as_view(), name='average_rating_provider'),
+    path('average_rating_provider/<int:pk>/', AverageRatingProvider.as_view(), name='average_rating_provider'),
 ]

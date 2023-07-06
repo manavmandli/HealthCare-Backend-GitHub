@@ -1,28 +1,19 @@
 from rest_framework import serializers
 from .models import *
+# from facility_app.serializers import JobPostSerializer
 
 class ProviderSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = ProviderModel
         fields = "__all__"
         
-
-class ExperienceSerializer(serializers.ModelSerializer):
+class ProviderRatingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ExperienceModel
+        model = ProviderRatingModel
         fields = "__all__"
 
-class EducationSerializer(serializers.ModelSerializer):
+class ProviderTotalRatingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EducationModel
-        fields = "__all__"
-
-class JobApplicationsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = JobApplicationsModel
-        fields = "__all__"
-
-class ProfilePictureSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProfilePicturesModel
+        model = ProviderAverageRatingModel
         fields = "__all__"

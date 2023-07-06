@@ -24,10 +24,11 @@ urlpatterns = [
     path('', include('user_app.urls')),
     path('', include('facility_app.urls')),
     path('', include('provider_app.urls')),
-    path('', include('common_app.urls')),
+    path('', include('jobs_app.urls')),
+    path('', include('notifications_app.urls')),
+    path('common/', include('commons_app.urls')),
     path("i18n/", include("django.conf.urls.i18n"))
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

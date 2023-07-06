@@ -45,12 +45,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework.authtoken',
+    'phonenumber_field',
+    'django_filters',
+    'commons_app',
     'user_app',
+    'notifications_app',
     'facility_app',
     'provider_app',
-    'phonenumber_field',
-    'common_app',
-    'django_better_admin_arrayfield'
+    'jobs_app',
 ]
 
 MIDDLEWARE = [
@@ -127,6 +129,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+PHONENUMBER_DEFAULT_REGION="US"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -139,7 +142,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = [BASE_DIR / 'media']
 
 
 # Default primary key field type
@@ -163,6 +166,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+     'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+     ],
+    'DEFAULT_PAGINATION_CLASS': 'utils.pagination_setup.PaginationWithPageCount',
+    'PAGE_SIZE': 20
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -173,7 +181,4 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_HEADERS = '*'
-CSRF_TRUSTED_ORIGINS = ["http://192.168.1.55:8000/", "https://b7f1-2401-4900-1f3e-4e00-52f8-1731-a6d0-b5fe.ngrok-free.app"]
-
-
-PHONENUMBER_DEFAULT_REGION="US"
+CSRF_TRUSTED_ORIGINS = ["http://192.168.1.55:8000/"]
